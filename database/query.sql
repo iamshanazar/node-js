@@ -5,3 +5,11 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT NOW(),
     type VARCHAR (250)
 );
+
+CREATE TABLE faculties (
+    id SERIAL PRIMARY KEY,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);
