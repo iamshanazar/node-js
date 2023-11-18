@@ -1,11 +1,10 @@
 import {execute} from '../../../database/db.js'
 
-export default class facultiesController {
-  static async getFaculties(req, res) { 
-
+export default class departmentController {
+  static async getDepartment(req, res) { 
     try {
       const { rows } = await execute(
-        `SELECT * FROM faculties  ORDER BY created_at ASC`,
+        `SELECT * FROM departments  ORDER BY created_at ASC`,
         []
       );
       if (rows) {
@@ -27,12 +26,12 @@ export default class facultiesController {
     }
   }
 
-  static async createFaculties(req, res) {
-    const { name_tk, name_en,name_ru } = req.body;
+  static async createDepartment(req, res) {
+    const { name_tk, name_en,name_ru, faculties_id } = req.body;
     try {
       const result = await execute(
-        `INSERT INTO faculties (name_tk, name_en,name_ru) VALUES ($1,$2,$3)`,
-        [name_tk, name_en,name_ru]
+        `INSERT INTO departments (name_tk, name_en,name_ru, faculties_id) VALUES ($1,$2,$3,$4)`,
+        [name_tk, name_en,name_ru, faculties_id]
       );
       if (result) {
         res.status(200).json({
@@ -49,16 +48,15 @@ export default class facultiesController {
     }
   }
 
-  static async getOneFaculties(req, res) {
+  static async getOneDepartment(req, res) {
     const id = req.params.id
-    console.log(req,'reqqqqqqqqqqq')
     try {
       const { rows } = await execute(
-        `SELECT * FROM faculties WHERE id = $1`,[id]
+        `SELECT * FROM departments WHERE id = $1`,[id]
       );
       if (rows) {
         res.send({
-          faculties: rows[0],
+          data: rows[0],
           status: true,
         });
       } else {
@@ -75,14 +73,15 @@ export default class facultiesController {
     }
   }
 
-  static async updateFaculties(req, res) {
-    const { name_tk, name_en,name_ru } = req.body;
+  static async updateDepartment(req, res) {
+    const { name_tk, name_en,name_ru, faculties_id } = req.body;
     const id = parseInt(req.params.id);
 
+    console.log(req.body)
     try {
       const result = await execute(
-        `UPDATE faculties SET name = $1, name_en = $2, name_ru = $3 WHERE id = $4`,
-         [name_tk, name_en,name_ru, id]
+        `UPDATE departments SET name_tk = $1, name_en = $2, name_ru = $3, faculties_id = $4 WHERE id = $5`,
+         [name_tk, name_en,name_ru, faculties_id, id]
       );
       if (result) {
         res.send({
@@ -100,14 +99,11 @@ export default class facultiesController {
     }
   }
 
-  static async deleteFaculties(req, res) {
-
-    const id = req.params.id;
-
-    
+  static async deleteDepartment(req, res) {
+    const id = req.params.id;    
     try {
       const result = await execute(
-        `DELETE FROM faculties WHERE id =$1`,[id]
+        `DELETE FROM departments WHERE id =$1`,[id]
       );
       if (result) {
         res.status(200).send({

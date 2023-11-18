@@ -2,16 +2,14 @@ import { execute } from '../../../database/db.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
-import { env } from '../../../config/config.js'
+// import { env } from '../../../config/config.js'
 
-console.log(env.ACCESS_TOKEN_SECRET_KEY)
 export default class authController {
 
   static async createSignUp(req, res) {
     const { name,  password, type } = req.body
     const hashedPassword = await bcrypt.hash(password, 10)
       
-   console.log(process.env.ACCESS_TOKEN_SECRET_KEY)
 
     try {
       const { rows } = await execute('INSERT INTO users (name,password,type) VALUES($1,$2,$3)', [
@@ -54,7 +52,6 @@ export default class authController {
               process.env.ACCESS_TOKEN_SECRET_KEY,
               { expiresIn: process.env.EXPIRE_ACCESS_TOKEN }
             )
-            console.log(process.env.EXPIRE_ACCESS_TOKEN,'token  ')
             const refreshToken = jwt.sign(
               {
                 name: user.name,

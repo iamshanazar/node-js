@@ -13,3 +13,12 @@ CREATE TABLE faculties (
     name_en VARCHAR,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    faculties_id INTEGER,
+    created_at TIMESTAMP DEFAULT NOW()
+);
