@@ -22,3 +22,12 @@ CREATE TABLE departments (
     faculties_id INTEGER,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE teachers (
+    id SERIAL PRIMARY KEY,
+    firstname VARCHAR,
+    lastname VARCHAR,
+    department_id INTEGER,
+    -- job: VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);

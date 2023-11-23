@@ -10,7 +10,6 @@ export default class authController {
     const { name,  password, type } = req.body
     const hashedPassword = await bcrypt.hash(password, 10)
       
-
     try {
       const { rows } = await execute('INSERT INTO users (name,password,type) VALUES($1,$2,$3)', [
         name,
