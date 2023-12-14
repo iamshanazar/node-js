@@ -31,3 +31,24 @@ CREATE TABLE teachers (
     -- job: VARCHAR,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE articles (
+    id SERIAL PRIMARY KEY,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER NOT NULL,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    file VARCHAR,
+    file_type VARCHAR,
+    file_size VARCHAR,
+    file_name VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);
