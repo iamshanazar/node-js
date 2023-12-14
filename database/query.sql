@@ -28,7 +28,8 @@ CREATE TABLE teachers (
     firstname VARCHAR,
     lastname VARCHAR,
     department_id INTEGER,
-    -- job: VARCHAR,
+    job VARCHAR,
+    sirname VARCHAR,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -43,6 +44,7 @@ CREATE TABLE articles (
 CREATE TABLE items (
     id SERIAL PRIMARY KEY,
     article_id INTEGER NOT NULL,
+    teacher_id INTEGER NOT NULL,
     name_tk VARCHAR,
     name_ru VARCHAR,
     name_en VARCHAR,

@@ -5,18 +5,17 @@ export default class itemsController {
   static async getItems(req, res) { 
     
     let limit = req.query.limit;
-    let page = req.query.page;
-     
+    let page = req.query.page; 
+    let id = req.query.teacher_id
+
     if (!req.query.limit && !req.query.page) {
       limit = 10;
       page = 1;
     }
-
     const offset = (page - 1) * limit;
-
     try {
       const { rows } = await execute(
-        `SELECT * FROM items ORDER BY date DESC LIMIT ${limit} OFFSET ${offset}`
+        `SELECT * FROM items WHERE teacher_id =$1 ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`[id]
       );
       if (rows) {
         res.send({
@@ -92,13 +91,26 @@ export default class itemsController {
   }
 
   static async updateItems(req, res) {
-    const { name_tk, name_en,name_ru } = req.body;
+   const { name_tk, name_en,name_ru, file_name, file_size, file_type} = req.body;
+
     const id = parseInt(req.params.id);
-    try {
-      const result = await execute(
-        `UPDATE articles SET name_tk = $1, name_en = $2, name_ru = $3 WHERE id = $4`,
-         [name_tk, name_en,name_ru, id]
-      );
+    
+    let files = "";
+    if (req.file) {
+      files = `/uploads/` + req.file.originalname;
+    }
+    
+    try { 
+        const result = await execute(
+           files 
+              ? `UPDATE items SET 
+                name_tk=$1, name_en=$2, name_ru=$3, file_name=$4, file_size=$5, file_type=$6, image = $7 WHERE id =$8`
+              : `UPDATE competitions SET 
+              name_tk=$1, name_en=$2, name_ru=$3, file_name=$4, file_size=$5, file_type=$6 WHERE id =$7`,
+           files 
+              ? [name_tk, name_en, name_ru, file_name, file_size, file_type, files, id]
+              : [name_tk, name_en, name_ru, file_name, file_size, file_type]
+          ); 
       if (result) {
         res.send({
           message: result,
@@ -115,11 +127,11 @@ export default class itemsController {
     }
   }
 
-  static async deleteArticles(req, res) {
+  static async deleteItems(req, res) {
     const id = req.params.id;    
     try {
       const result = await execute(
-        `DELETE FROM articles WHERE id =$1`,[id]
+        `DELETE FROM WHERE id =$1`,[id]
       );
       if (result) {
         res.status(200).send({

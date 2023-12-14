@@ -81,7 +81,7 @@ export default class facultiesController {
 
     try {
       const result = await execute(
-        `UPDATE faculties SET name = $1, name_en = $2, name_ru = $3 WHERE id = $4`,
+        `UPDATE faculties SET name_tk = $1, name_en = $2, name_ru = $3 WHERE id = $4`,
          [name_tk, name_en,name_ru, id]
       );
       if (result) {
