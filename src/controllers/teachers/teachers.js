@@ -16,10 +16,15 @@ export default class teachersController {
   }
    
   const offset = (page - 1) * limit;
+  
+  // const depId = `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`[id]
+  const teachers = `SELECT * FROM teachers LIMIT ${limit} OFFSET ${offset},[]`
+  
     try {
       const { rows } = await execute(
-        `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`,
-        [id]
+        id ? `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`
+          : `SELECT * FROM teachers LIMIT ${limit} OFFSET ${offset}`,
+        id ? [id] : []
       );
       if (rows) {
         res.send({
