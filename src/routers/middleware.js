@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken'
 
 export const authenticate = async (req, res, next) => {
-  const auth = req.headers?.authorization
+  const auth = req.headers?.Authorization
 
+  console.log(auth,'auth')
+  console.log(req.headers?.Authorization)
 
   if (!auth) {
     return res.status(401).send('Missing authorization header')
