@@ -4,7 +4,7 @@ export const authenticate = async (req, res, next) => {
   const auth = req.headers?.Authorization
 
   console.log(auth,'auth')
-  console.log(req.headers?.Authorization)
+  console.log(req.headers)
 
   if (!auth) {
     return res.status(401).send('Missing authorization header')
