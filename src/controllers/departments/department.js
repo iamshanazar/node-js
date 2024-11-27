@@ -8,18 +8,18 @@ export default class departmentController {
         []
       );
       if (rows) {
-        res.send({
+       return res.send({
           data: rows,
           status: true,
         });
       } else {
-        res.status(500).json({
+        return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -34,17 +34,17 @@ export default class departmentController {
         [name_tk, name_en,name_ru, faculties_id]
       );
       if (result) {
-        res.status(200).json({
+        return res.status(200).json({
           status: true,
           message: "Succesfully created!",
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Bad request",
         });
       }
     } catch (err) {
-      res.send(err.message);
+      return res.send(err.message);
     }
   }
 
@@ -55,18 +55,18 @@ export default class departmentController {
         `SELECT * FROM departments WHERE id = $1`,[id]
       );
       if (rows) {
-        res.send({
+        return res.send({
           data: rows[0],
           status: true,
         });
       } else {
-        res.status(500).json({
+        return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -77,25 +77,24 @@ export default class departmentController {
     const { name_tk, name_en,name_ru, faculties_id } = req.body;
     const id = parseInt(req.params.id);
 
-    console.log(req.body)
     try {
       const result = await execute(
         `UPDATE departments SET name_tk = $1, name_en = $2, name_ru = $3, faculties_id = $4 WHERE id = $5`,
          [name_tk, name_en,name_ru, faculties_id, id]
       );
       if (result) {
-        res.send({
+        return res.send({
           message: result,
           status: true,
         });
       } else {
-        res.send({
+        return res.send({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.send(err.message);
+      return res.send(err.message);
     }
   }
 
@@ -106,15 +105,15 @@ export default class departmentController {
         `DELETE FROM departments WHERE id =$1`,[id]
       );
       if (result) {
-        res.status(200).send({
+        return res.status(200).send({
           message: `${id} id has been succesfully deleted`,
           status: true,
         });
       } else {
-        res.status(400).send("Something is wrong");
+        return res.status(400).send("Something is wrong");
       }
     } catch (err) {
-      res.send(err.message);
+      return res.send(err.message);
     }
   }
 }

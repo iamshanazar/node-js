@@ -18,7 +18,6 @@ export default class teachersController {
   const offset = (page - 1) * limit;
   
   // const depId = `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`[id]
-  const teachers = `SELECT * FROM teachers LIMIT ${limit} OFFSET ${offset},[]`
   
     try {
       const { rows } = await execute(
@@ -27,18 +26,18 @@ export default class teachersController {
         id ? [id] : []
       );
       if (rows) {
-        res.send({
+  return      res.send({
           data: rows, 
           status: true,
         });
       } else {
-        res.status(500).json({
+       return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -59,17 +58,17 @@ export default class teachersController {
         [name, pass]
       )
       if (result && rows) {
-        res.status(200).json({
+       return res.status(200).json({
           status: true,
           message: "Succesfully created!",
         });
       } else {
-        res.status(400).json({
+         return res.status(400).json({
           message: "Bad request",
         });
       }
     } catch (err) {
-      res.send(err.message);
+    return  res.send(err.message);
     }
   }
 
@@ -80,18 +79,18 @@ export default class teachersController {
         `SELECT * FROM teacheres WHERE id = $1`,[id]
       );
       if (rows) {
-        res.send({
+        return  res.send({
           faculties: rows[0],
           status: true,
         });
       } else {
-        res.status(500).json({
+       return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -113,18 +112,18 @@ export default class teachersController {
          [firstname,lastname,name,pass,department_id, sirname, job, id]
       );
       if (result) {
-        res.send({
+       return res.send({
           message: result,
           status: true,
         });
       } else {
-        res.send({
+      return  res.send({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.send(err.message);
+       return res.send(err.message);
     }
   }
 
@@ -135,15 +134,15 @@ export default class teachersController {
         `DELETE FROM teachers WHERE id =$1`,[id]
       );
       if (result) {
-        res.status(200).send({
+       return res.status(200).send({
           message: `${id} id has been succesfully deleted`,
           status: true,
         });
       } else {
-        res.status(400).send("Something is wrong");
+         return res.status(400).send("Something is wrong");
       }
     } catch (err) {
-      res.send(err.message);
+      return res.send(err.message);
     }
   }
 }

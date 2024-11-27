@@ -16,12 +16,12 @@ export default class authController {
         hashedPassword,
         type
       ])
-      res.status(201).json({
+     return res.status(201).json({
         message: `${rows[0].id} Has been succesfully registred`,
         status: true,
       })
     } catch (err) {
-      res.status(500).json({
+       return res.status(500).json({
         message: 'User already exist',
         status: false,
       })
@@ -34,13 +34,13 @@ export default class authController {
       const { rows } = await execute('SELECT * FROM users WHERE name =$1', [name])
       const user = rows[0]
       if (!user) {
-        res.status(400).json({
+      return  res.status(400).json({
           error: 'User is not registered, Sign Up first or enter correct password',
         })
       } else {
         bcrypt.compare(password, user.password, (err, result) => {
           if (err) {
-            res.status(500).json({
+           return res.status(500).json({
               error: 'Server error',
             })
           } else if (result === true) {
@@ -58,7 +58,7 @@ export default class authController {
               process.env.REFRESH_TOKEN_SECRET_KEY,
               { expiresIn: process.env.EXPIRE_REFRESH_TOKEN }
             )
-            res.status(200).json({
+           return  res.status(200).json({
               message: 'User signed in!',
               access_token: token,
               refresh_token: refreshToken,
@@ -74,7 +74,7 @@ export default class authController {
         })
       }
     } catch (err) {
-      res.status(500).json({
+     return  res.status(500).json({
         error: err,
       })
     }

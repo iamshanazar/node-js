@@ -18,18 +18,18 @@ export default class itemsController {
         `SELECT * FROM items WHERE teacher_id =$1 ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`[id]
       );
       if (rows) {
-        res.send({
+        return res.send({
           data: rows,
           status: true,
         });
       } else {
-        res.status(500).json({
+        return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -51,12 +51,12 @@ export default class itemsController {
           [name_tk, name_en,name_ru, file_name, file_size, file_type,article_id, files]
       );
       if (result) {
-        res.status(200).json({
+        return res.status(200).json({
           status: true,
           message: "Succesfully created!",
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Bad request",
         });
       }
@@ -72,18 +72,18 @@ export default class itemsController {
         `SELECT * FROM items WHERE id = $1`,[id]
       );
       if (rows) {
-        res.send({
+        return res.send({
           data: rows[0],
           status: true,
         });
       } else {
-        res.status(500).json({
+        return res.status(500).json({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: err.message,
         status: false,
       });
@@ -112,18 +112,18 @@ export default class itemsController {
               : [name_tk, name_en, name_ru, file_name, file_size, file_type]
           ); 
       if (result) {
-        res.send({
+        return res.send({
           message: result,
           status: true,
         });
       } else {
-        res.send({
+        return res.send({
           message: "Something is wrong",
           status: false,
         });
       }
     } catch (err) {
-      res.send(err.message);
+       return res.send(err.message);
     }
   }
 
@@ -134,15 +134,15 @@ export default class itemsController {
         `DELETE FROM WHERE id =$1`,[id]
       );
       if (result) {
-        res.status(200).send({
+        return  res.status(200).send({
           message: `${id} id has been succesfully deleted`,
           status: true,
         });
       } else {
-        res.status(400).send("Something is wrong");
+        return res.status(400).send("Something is wrong");
       }
     } catch (err) {
-      res.send(err.message);
+       return res.send(err.message);
     }
   }
 }

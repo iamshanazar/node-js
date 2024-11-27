@@ -24,9 +24,9 @@ export default class tokenController {
         access_token: token,
         refresh_token: refreshToken,
       }
-      res.status(201).send(response)
+    return   res.status(201).send(response)
     } catch (err) {
-      res.status(401).send('Unauthorized')
+     return  res.status(401).send('Unauthorized')
     }
   }
 }
