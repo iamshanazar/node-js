@@ -81,6 +81,8 @@ export default class ArticleController {
           const { name_tk, name_en, name_ru, author, type } = req.body;
           const file = req.file;
   
+          console.log(req.body, 'body', file,'file')
+  
           if (!name_tk || !name_en || !name_ru) {
               return res.status(400).json({
                   message: "All fields are required",
@@ -99,7 +101,7 @@ export default class ArticleController {
               // Insert article and file information into the database
               const result = await execute(
                   `INSERT INTO articles (name_tk, name_en, name_ru, author,type, file_name, file_size) 
-                   VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+                   VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
                   [name_tk, name_en, name_ru, author, type, file.filename, file.size]
               );
   
@@ -161,7 +163,7 @@ export default class ArticleController {
                 status: false,
             });
         }
-    console.log(req.body, 'body', id)
+
         if (!name_tk || !name_en || !name_ru) {
             return res.status(400).json({
                 message: "All fields are required",

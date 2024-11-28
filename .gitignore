@@ -1,6 +1,4 @@
 node_modules
-<<<<<<< HEAD
 .env
 .DS_Store
-=======
->>>>>>> 80de0ea (add: booking page)
+.uploads
