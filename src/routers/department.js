@@ -5,8 +5,8 @@ import departmentController from "../controllers/departments/department.js";
 
 export const departmentRouter = Router()
 
-departmentRouter.get('/', authenticate, departmentController.getDepartment)
-departmentRouter.get('/:id', authenticate, departmentController.getOneDepartment)
-departmentRouter.post('/', authenticate, departmentController.createDepartment)
-departmentRouter.put('/:id', authenticate, departmentController.updateDepartment)
-departmentRouter.delete('/:id', authenticate, departmentController.deleteDepartment)
+departmentRouter.get('/',  departmentController.getDepartment)
+departmentRouter.get('/:id',  departmentController.getOneDepartment)
+departmentRouter.post('/',  departmentController.createDepartment)
+departmentRouter.put('/:id',  departmentController.updateDepartment)
+departmentRouter.delete('/:id',  departmentController.deleteDepartment)

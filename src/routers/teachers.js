@@ -4,8 +4,8 @@ import { authenticate } from "./middleware.js";
 
 export const teacheresRouter = Router()
 
-teacheresRouter.get('/', authenticate, teachersController.getTeachers)
-teacheresRouter.get('/:id', authenticate, teachersController.getOneTeachers)
-teacheresRouter.put('/:id', authenticate, teachersController.updateTeachers)
-teacheresRouter.post('/', authenticate, teachersController.createTeachers)
-teacheresRouter.delete('/', authenticate, teachersController.deleteTeachers)
+teacheresRouter.get('/',  teachersController.getTeachers)
+teacheresRouter.get('/:id',  teachersController.getOneTeachers)
+teacheresRouter.put('/:id',  teachersController.updateTeachers)
+teacheresRouter.post('/',  teachersController.createTeachers)
+teacheresRouter.delete('/',  teachersController.deleteTeachers)

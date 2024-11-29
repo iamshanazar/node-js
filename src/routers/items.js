@@ -17,9 +17,9 @@ const storageConfig = multer.diskStorage({
 
 const upload = multer({ storage: storageConfig });
 
-itemsRouter.get('/', authenticate, itemsController.getItems)
-itemsRouter.get('/:id', authenticate, itemsController.getOneItems)
-itemsRouter.post('/', authenticate, upload.single('file'), itemsController.createItems)
-itemsRouter.put('/:id', authenticate,upload.single('file'), itemsController.updateItems)
-itemsRouter.delete('/:id', authenticate, itemsController.deleteItems)
+itemsRouter.get('/',  itemsController.getItems)
+itemsRouter.get('/:id',  itemsController.getOneItems)
+itemsRouter.post('/',  upload.single('file'), itemsController.createItems)
+itemsRouter.put('/:id', upload.single('file'), itemsController.updateItems)
+itemsRouter.delete('/:id',  itemsController.deleteItems)
 
