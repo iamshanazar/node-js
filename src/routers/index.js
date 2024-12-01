@@ -5,6 +5,8 @@ import { departmentRouter } from './department.js'
 import { teacheresRouter } from './teachers.js'
 import { articleRouter } from './articles.js'
 import { itemsRouter } from './items.js'
+import { zurnalRouter } from './zurnals.js'
+
 export const allRouter = Router()
 
 
@@ -14,3 +16,4 @@ allRouter.use('/departments', departmentRouter)
 allRouter.use('/teachers', teacheresRouter)
 allRouter.use('/articles', articleRouter)
 allRouter.use('/items', itemsRouter)
+allRouter.use('/zurnal', zurnalRouter)
