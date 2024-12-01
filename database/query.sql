@@ -33,13 +33,7 @@ CREATE TABLE teachers (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE articles (
-    id SERIAL PRIMARY KEY,
-    name_tk VARCHAR,
-    name_ru VARCHAR,
-    name_en VARCHAR,
-    created_at TIMESTAMP DEFAULT NOW()
-);
+
 
 CREATE TABLE items (
     id SERIAL PRIMARY KEY,
@@ -54,3 +48,34 @@ CREATE TABLE items (
     file_name VARCHAR,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE TABLE zurnal (
+    id SERIAL PRIMARY KEY,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE articles (
+    id SERIAL PRIMARY KEY,
+    name_tk VARCHAR,
+    name_ru VARCHAR,
+    name_en VARCHAR,
+    created_at TIMESTAMP DEFAULT NOW(),
+    zurnal_id INT NOT NULL,
+    teacher_id INT, 
+    constraint articles_zurnal_id_fk
+      foreign key("zurnal_id")
+        references zurnal("id")
+         on update cascade on delete cascade,
+
+    constraint articles_teacher_id_fk
+      foreign key("teacher_id")
+        references  teachers("id")
+         on update cascade on delete cascade,
+    UNIQUE ("zurnal_id", "name_tk")
+);
+
+CREATE INDEX articles_zurnal_id_index on articles ('zurnal_id');
+

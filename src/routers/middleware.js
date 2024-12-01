@@ -1,25 +1,34 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 export const authenticate = async (req, res, next) => {
-  const auth = req.headers?.authorization
+  const auth = req.headers?.authorization;
 
-
+  console.log(auth,'auth')
   if (!auth) {
-     res.status(401).send('Missing authorization header')
-  } 
-  try { 
-    const token = auth.split(' ')[1]
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY)
-    const userId = decodedToken.userId
-    if (req.body.userId !== userId) {
-        res.status(401).send('Invalid authorization header')
-    } else {
-      next()
-    }
-  } catch (err) {
-     res.status(403).json({
-      error: new Error('Invalid request!'),
-      message: err.message,
-    })
+    return res.status(401).json({ message: 'Missing authorization header' });
   }
-}
+
+  try {
+    // Extract the token from the "Bearer <token>" format
+    const token = auth.split(' ')[1];
+
+    console.log(auth.split(' ')[1]);
+    if (!token) {
+      return res.status(401).json({ message: 'Token not provided' });
+    }
+
+    // Verify the token
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+
+    // Add the decoded user information to the request object
+    req.user = decodedToken;
+
+    // Proceed to the next middleware
+    next();
+  } catch (err) {
+    return res.status(403).json({
+      message: 'Invalid token',
+      error: err.message,
+    });
+  }
+};

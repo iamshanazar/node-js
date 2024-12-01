@@ -1,38 +1,42 @@
-import {execute} from '../../../database/db.js'
-
-import bcrypt from 'bcrypt'
+import { execute } from '../../../database/db.js';
+import bcrypt from 'bcrypt';
 
 export default class teachersController {
-
-  static async getTeachers(req, res) { 
-  const id = req.query.department_id
-  let limit = req.query.limit;
-  let page = req.query.page;
- 
-
-  if (!req.query.limit && !req.query.page) {
-    limit = 10;
-    page = 1;
-  }
-   
-  const offset = (page - 1) * limit;
+  // Get all teachers or filter by department_id
+  static async getTeachers(req, res) {
+    const { department_id: id, limit = 10, page = 1 } = req.query;
   
-  // const depId = `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`[id]
+    const offset = (page - 1) * limit;
   
     try {
-      const { rows } = await execute(
-        id ? `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id  WHERE department_id = $1 LIMIT ${limit} OFFSET ${offset}`
-          : `SELECT * FROM teachers LIMIT ${limit} OFFSET ${offset}`,
-        id ? [id] : []
-      );
-      if (rows) {
-  return      res.send({
-          data: rows, 
+      // Query for teachers
+      const query = id
+        ? `SELECT * FROM teachers t INNER JOIN departments d ON t.department_id = d.id WHERE t.department_id = $1 LIMIT $2 OFFSET $3`
+        : `SELECT * FROM teachers LIMIT $1 OFFSET $2`;
+  
+      const params = id ? [id, limit, offset] : [limit, offset];
+  
+      const { rows } = await execute(query, params);
+  
+      // Query for total count
+      const countQuery = id
+        ? `SELECT COUNT(*) FROM teachers t INNER JOIN departments d ON t.department_id = d.id WHERE t.department_id = $1`
+        : `SELECT COUNT(*) FROM teachers`;
+  
+      const countParams = id ? [id] : [];
+      const countResult = await execute(countQuery, countParams);
+  
+      const total = parseInt(countResult.rows[0].count, 10); // Total count of teachers
+  
+      if (rows.length > 0) {
+        return res.status(200).json({
+          data: rows,
+          total, // Total count of teachers
           status: true,
         });
       } else {
-       return res.status(500).json({
-          message: "Something is wrong",
+        return res.status(404).json({
+          message: 'No teachers found.',
           status: false,
         });
       }
@@ -43,49 +47,59 @@ export default class teachersController {
       });
     }
   }
+  
 
+  // Create a new teacher and user
   static async createTeachers(req, res) {
+    const { firstname, lastname, name, password, department_id, sirname, job } = req.body;
 
-    const {firstname, lastname, name, password,  department_id, sirname, job } = req.body;
-    const pass =  await bcrypt.hash(password, 10)
-  try {
-      const result = await execute(
-        `INSERT INTO teachers (firstname, lastname, department_id, sirname, job) VALUES ($1,$2,$3,$4, $5 )`,
+    if (!firstname || !lastname || !name || !password || !department_id || !sirname || !job) {
+      return res.status(400).json({
+        message: 'All fields are required.',
+        status: false,
+      });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await execute(
+        `INSERT INTO teachers (firstname, lastname, department_id, sirname, job) VALUES ($1, $2, $3, $4, $5)`,
         [firstname, lastname, department_id, sirname, job]
       );
-      const rows = await execute(
+
+      await execute(
         `INSERT INTO users (name, password, type) VALUES ($1, $2, 'user')`,
-        [name, pass]
-      )
-      if (result && rows) {
-       return res.status(200).json({
-          status: true,
-          message: "Succesfully created!",
-        });
-      } else {
-         return res.status(400).json({
-          message: "Bad request",
-        });
-      }
+        [name, hashedPassword]
+      );
+
+      return res.status(201).json({
+        status: true,
+        message: 'Teacher successfully created!',
+      });
     } catch (err) {
-    return  res.send(err.message);
+      return res.status(500).json({
+        message: err.message,
+        status: false,
+      });
     }
   }
 
+  // Get a single teacher by ID
   static async getOneTeachers(req, res) {
-    const id = req.params.id
+    const { id } = req.params;
+
     try {
-      const { rows } = await execute(
-        `SELECT * FROM teacheres WHERE id = $1`,[id]
-      );
-      if (rows) {
-        return  res.send({
-          faculties: rows[0],
+      const { rows } = await execute(`SELECT * FROM teachers WHERE id = $1`, [id]);
+
+      if (rows.length > 0) {
+        return res.status(200).json({
+          data: rows[0],
           status: true,
         });
       } else {
-       return res.status(500).json({
-          message: "Something is wrong",
+        return res.status(404).json({
+          message: 'Teacher not found.',
           status: false,
         });
       }
@@ -97,52 +111,96 @@ export default class teachersController {
     }
   }
 
+  // Update teacher information
   static async updateTeachers(req, res) {
-    const {firstname, lastname, name, password, department_id, sirname, job } = req.body;
+    const { firstname, lastname, name, password, department_id, sirname, job } = req.body;
+    const { id } = req.params;
 
-    const id = parseInt(req.params.id);
-    let pass = null 
+    if (!id) {
+      return res.status(400).json({
+        message: 'Teacher ID is required.',
+        status: false,
+      });
+    }
+
+    let hashedPassword = null;
     if (password) {
-     return  pass = bcrypt.hash(password,10)
+      hashedPassword = await bcrypt.hash(password, 10);
     }
 
     try {
-      const result = await execute(
-        `UPDATE teachers SET firstname= $1, lastname = $2, name = $3, password = ${pass}, department_id = $4, sirname = $5, job=$6  WHERE id = $7`,
-         [firstname,lastname,name,pass,department_id, sirname, job, id]
-      );
-      if (result) {
-       return res.send({
-          message: result,
+      const query = `UPDATE teachers SET 
+        firstname = $1, 
+        lastname = $2, 
+        name = $3, 
+        password = COALESCE($4, password), 
+        department_id = $5, 
+        sirname = $6, 
+        job = $7 
+        WHERE id = $8`;
+
+      const params = [
+        firstname,
+        lastname,
+        name,
+        hashedPassword,
+        department_id,
+        sirname,
+        job,
+        id,
+      ];
+
+      const result = await execute(query, params);
+
+      if (result.rowCount > 0) {
+        return res.status(200).json({
+          message: 'Teacher successfully updated.',
           status: true,
         });
       } else {
-      return  res.send({
-          message: "Something is wrong",
+        return res.status(404).json({
+          message: 'Teacher not found.',
           status: false,
         });
       }
     } catch (err) {
-       return res.send(err.message);
+      return res.status(500).json({
+        message: err.message,
+        status: false,
+      });
     }
   }
 
+  // Delete a teacher
   static async deleteTeachers(req, res) {
-    const id = req.params.id; 
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: 'Teacher ID is required.',
+        status: false,
+      });
+    }
+
     try {
-      const result = await execute(
-        `DELETE FROM teachers WHERE id =$1`,[id]
-      );
-      if (result) {
-       return res.status(200).send({
-          message: `${id} id has been succesfully deleted`,
+      const result = await execute(`DELETE FROM teachers WHERE id = $1`, [id]);
+
+      if (result.rowCount > 0) {
+        return res.status(200).json({
+          message: `Teacher with ID ${id} has been successfully deleted.`,
           status: true,
         });
       } else {
-         return res.status(400).send("Something is wrong");
+        return res.status(404).json({
+          message: 'Teacher not found.',
+          status: false,
+        });
       }
     } catch (err) {
-      return res.send(err.message);
+      return res.status(500).json({
+        message: err.message,
+        status: false,
+      });
     }
   }
 }

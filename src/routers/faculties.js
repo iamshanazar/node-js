@@ -4,8 +4,8 @@ import { authenticate } from "./middleware.js";
 
 export const facultiesRouter = Router()
 
-facultiesRouter.get('/',  facultiesController.getFaculties)
-facultiesRouter.get('/:id',  facultiesController.getOneFaculties)
-facultiesRouter.post('/',  facultiesController.createFaculties)
-facultiesRouter.put('/:id', facultiesController.updateFaculties)
-facultiesRouter.delete('/:id',  facultiesController.deleteFaculties)
+facultiesRouter.get('/', authenticate,  facultiesController.getFaculties)
+facultiesRouter.get('/:id',authenticate,  facultiesController.getOneFaculties)
+facultiesRouter.post('/', authenticate,  facultiesController.createFaculties)
+facultiesRouter.put('/:id', authenticate, facultiesController.updateFaculties)
+facultiesRouter.delete('/:id', authenticate, facultiesController.deleteFaculties)
