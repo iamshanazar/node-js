@@ -11,8 +11,7 @@ export const authenticate = async (req, res, next) => {
   try {
     // Extract the token from the "Bearer <token>" format
     const token = auth.split(' ')[1];
-
-    console.log(auth.split(' ')[1]);
+    
     if (!token) {
       return res.status(401).json({ message: 'Token not provided' });
     }

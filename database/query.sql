@@ -65,6 +65,7 @@ CREATE TABLE articles (
     created_at TIMESTAMP DEFAULT NOW(),
     zurnal_id INT NOT NULL,
     teacher_id INT, 
+    type VARCHAR,
     constraint articles_zurnal_id_fk
       foreign key("zurnal_id")
         references zurnal("id")
