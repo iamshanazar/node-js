@@ -2,21 +2,32 @@ import { execute } from "../../../database/db.js";
 import upload from "../../../function/upload.js";
 export default class ArticleController {
     static async getArticles(req, res) {
-        const { limit = 10, page = 1, zurnal_id, search } = req.query;
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const page = parseInt(req.query.page, 10) || 1;
         const offset = (page - 1) * limit;
+    
+        if (limit <= 0 || page <= 0) {
+            return res.status(400).json({
+                status: false,
+                message: "Limit and page must be positive integers.",
+            });
+        }
     
         let query = `SELECT id, name_tk, name_en, name_ru, created_at, zurnal_id, teacher_id, type, file_name, file_size
                      FROM articles WHERE 1=1`;
+        let countQuery = `SELECT COUNT(*) AS total FROM articles WHERE 1=1`;
         let params = [];
     
-        if (search) {
+        if (req.query.search) {
             query += ` AND (name_tk ILIKE $${params.length + 1} OR name_en ILIKE $${params.length + 2} OR name_ru ILIKE $${params.length + 3})`;
-            params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+            countQuery += ` AND (name_tk ILIKE $${params.length + 1} OR name_en ILIKE $${params.length + 2} OR name_ru ILIKE $${params.length + 3})`;
+            params.push(`%${req.query.search}%`, `%${req.query.search}%`, `%${req.query.search}%`);
         }
     
-        if (zurnal_id) {
+        if (req.query.zurnal_id) {
             query += ` AND zurnal_id = $${params.length + 1}`;
-            params.push(zurnal_id);
+            countQuery += ` AND zurnal_id = $${params.length + 1}`;
+            params.push(req.query.zurnal_id);
         }
     
         query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
@@ -24,25 +35,24 @@ export default class ArticleController {
     
         try {
             const { rows } = await execute(query, params);
+            const { rows: countResult } = await execute(countQuery, params.slice(0, -2));
+            const total = countResult[0]?.total || 0;
+            const totalPages = Math.ceil(total / limit);
     
-            if (rows.length > 0) {
-                const baseUrl = 'http://213.130.144.154/uploads'; // Ensure this is the correct base URL for your app
+            rows.forEach(article => {
+                const baseUrl = 'http://213.130.144.154/uploads';
+                article.file_url = `${baseUrl}/${article.file_name}`;
+                article.file_size = (article.file_size / (1024 * 1024)).toFixed(2);
+            });
     
-                // Add file URL to each article
-                rows.forEach(article => {
-                    article.file_url = `${baseUrl}/${article.file_name}`; // Correct the URL generation
-                });
-    
-                return res.status(200).json({
-                    status: true,
-                    data: rows,
-                });
-            } else {
-                return res.status(404).json({
-                    message: "No articles found.",
-                    status: false,
-                });
-            }
+            return res.status(200).json({
+                status: true,
+                data: rows,
+                    total,
+                    totalPages,
+                    currentPage: page,
+                    hasNextPage: page < totalPages,
+            });
         } catch (err) {
             return res.status(500).json({
                 message: err.message || "An unexpected error occurred",
@@ -52,10 +62,6 @@ export default class ArticleController {
     }
     
     
-    
-    
-
-
     static async createArticle(req, res) {
         upload.single('file')(req, res, async (err) => {
             if (err) {
@@ -115,7 +121,7 @@ export default class ArticleController {
       // Get Single Article
     static async getArticleById(req, res) {
         const { id } = req.params;
-
+       console.log(id,'id')
         try {
             const result = await execute(`SELECT * FROM articles WHERE id = $1`, [id]);
 
@@ -149,7 +155,7 @@ export default class ArticleController {
             }
 
             const { id } = req.params;
-            const { name_tk, name_en, name_ru, author, type, zurnal_id, teacher_id } = req.body;
+            const { name_tk, name_en, name_ru, type, zurnal_id, teacher_id } = req.body;
             const file = req.file;
 
             try {
@@ -163,14 +169,13 @@ export default class ArticleController {
 
                 const query = `
                     UPDATE articles 
-                    SET name_tk = $1, name_en = $2, name_ru = $3, author = $4, type = $5, zurnal_id = $6, 
-                        teacher_id = $7, file_name = $8, file_size = $9
-                    WHERE id = $10 RETURNING *`;
+                    SET name_tk = $1, name_en = $2, name_ru = $3, type = $4, zurnal_id = $5, 
+                        teacher_id = $6, file_name = $7, file_size = $8
+                    WHERE id = $9 RETURNING *`;
                 const params = [
                     name_tk || article.rows[0].name_tk,
                     name_en || article.rows[0].name_en,
                     name_ru || article.rows[0].name_ru,
-                    author || article.rows[0].author,
                     type || article.rows[0].type,
                     zurnal_id || article.rows[0].zurnal_id,
                     teacher_id || article.rows[0].teacher_id,
