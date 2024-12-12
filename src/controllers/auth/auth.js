@@ -29,7 +29,7 @@ export default class authController {
   }
 
   static async createSignIn(req, res) {
-    const { name, password,  } = req.body
+    const { name, password  } = req.body
     try {
       const { rows } = await execute('SELECT * FROM users WHERE name =$1', [name])
       const user = rows[0]

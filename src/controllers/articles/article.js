@@ -29,6 +29,11 @@ export default class ArticleController {
             countQuery += ` AND zurnal_id = $${params.length + 1}`;
             params.push(req.query.zurnal_id);
         }
+        if (req.query.teacher_id) {
+            query += ` AND teacher_id = $${params.length + 1}`;
+            countQuery += ` AND teacher_id = $${params.length + 1}`;
+            params.push(req.query.teacher_id);
+        }
     
         query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
         params.push(limit, offset);
